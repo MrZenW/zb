@@ -67,9 +67,9 @@
     };
     //单例实例
     boss.__bossInstance = null;
-    boss.prototype.VER_NAME = 'ZB_FRAMEWORK_2.1';
-    boss.prototype.VER_STRING = 'ZB/2.1';
-    boss.prototype.VER_NUMBER = '2.1';
+    boss.prototype.VER_NAME = 'ZB_FRAMEWORK_2.2';
+    boss.prototype.VER_STRING = 'ZB/2.2';
+    boss.prototype.VER_NUMBER = '2.2';
     boss.prototype.extendEvent = function(obj){
         obj.__events = obj.__events || {};
         obj.on = boss.prototype.on;
