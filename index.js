@@ -103,7 +103,7 @@
     };
 
     //对某个函数超时调用的默认调用
-    boss.prototype.funcTimeout = function(func,timeout){
+    boss.prototype.timeoutFunction = function(func,timeout){
         var self = this;
         if((timeout|0)>0){
             var funcTimeoutTHD = 0;
