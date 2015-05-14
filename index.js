@@ -429,7 +429,7 @@
         
     };
 
-
+    //工作程式主函数
     boss.prototype.emitCronjob = function(){
         var self = this;        
         var now = new Date();
@@ -449,7 +449,6 @@
 		if(!!defaultTimeEventsIHD){
 			return defaultTimeEventsIHD;
 		}
-
         defaultTimeEventsIHD = setInterval(self.emitCronjob,1000*60);
         return defaultTimeEventsIHD;
     };
