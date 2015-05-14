@@ -62,7 +62,7 @@
         this.checkLevel = {0:true};
         this.debug=1;
         this._loadFn = null;
-
+        this.emitCronjobBind();
 
     };
     //单例实例
@@ -430,7 +430,7 @@
     };
 
     //工作程式主函数
-    boss.prototype.emitCronjob = function(){
+    var __emitCronjobFunc = function(){
         var self = this;        
         var now = new Date();
         var nowTimeStamp = now.valueOf();
@@ -441,6 +441,9 @@
         self.emit("boss.time.xx:xx",nowTimeStamp,now);
         self.emit("boss.time."+hi,nowTimeStamp,now);
         self.emit("boss.time.xx:"+i,nowTimeStamp,now);
+    };
+    boss.prototype.emitCronjobBind = function(){
+        this.emitCronjob = __emitCronjobFunc.bind(this);
     };
 
     var defaultTimeEventsIHD = null;//默认时间事件句柄
