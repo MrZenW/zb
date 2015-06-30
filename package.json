@@ -1,6 +1,6 @@
 {
   "name": "zb",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "description": "zb is a JavaScript/Node.js function lib and Framework",
   "main": "index.js",
   "scripts": {
