@@ -326,12 +326,21 @@
                 output:fl
 
             });
-            var lineNum = 0;
+            var lineNum = -1;
             rl.on('line',function(line){
                 lineNum++;
-                cb.call(rl,line,lineNum);
+                if(cb.call(rl,line,lineNum)===false){
+                    rl.close();
+                }
             })
-            fl.on('end',endCB);
+            fl.on('end',function(){
+                endCB.call(rl,'end',lineNum);
+            });
+            fl.on('close',function(){
+                endCB.call(rl,'close',lineNum);
+            });
+
+
         });
 
 
