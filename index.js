@@ -1,10 +1,10 @@
 /**
  * Created with JetBrains WebStorm.
- * User:	zenboss
- * GitHub:	zenboss
- * Date:	13-8-13
- * Time:	下午10:21
- * Email:	zenyes@gmail.com
+ * User:    zenboss
+ * GitHub:  zenboss
+ * Date:    13-8-13
+ * Time:    下午10:21
+ * Email:   zenyes@gmail.com
  */
 "use strict";
 
@@ -22,14 +22,12 @@
         _window = window;
         isNode = false;
     }
+    
+    var arrayProto = Array.prototype;
 
 
     var __innerNextTick = null;
-
-
     var __syncInnerExec = function(funcs,count,fnSum,argv,self,nextArgs){
-
-
         if(count == fnSum){
             return;
         }else{
@@ -43,7 +41,6 @@
                 argv,
                 nextArgs
             );
-
         }
     };
 
@@ -81,14 +78,11 @@
         return obj;
     };
     boss.prototype.isNode = isNode;
-    boss.prototype.sync = function(funcQ,argv){
+    boss.prototype.sync = function(funcQ,someArgv){
         var self = this;
         var fLen = funcQ.length;
-        argv = argv||{};
-        if(!Array.isArray(argv)){
-            argv=[argv];
-        }
-
+        var argv = arrayProto.slice.call(arguments,1);
+        
         return __syncInnerExec(funcQ,0,fLen,argv,self);
 
     };
@@ -125,11 +119,11 @@
 
     };
 
-	//UUID
-	var UUID = 1;
-	boss.prototype.uuid = function(){
-		return UUID++;
-	}
+    //UUID
+    var UUID = 1;
+    boss.prototype.uuid = function(){
+        return UUID++;
+    }
 
 
     //委派事件
@@ -355,17 +349,45 @@
         fs.exists(dir,function(exists){
             if(exists){
                 cb(null,dir);
-
             }else{
                 self.mkdirs(path.dirname(dir),mode,function(){
                     fs.mkdir(dir,mode,cb);
                 });
-
             }
-
-        })
-
+        });
     };
+    
+    boss.prototype.addAction = function(actionName,actionObj){
+        if('object' == typeof actionName){
+            for(var key in actionName){
+                this.__actions[key] = actionName[key];
+            }
+        }else{
+            this.__actions[actionName] = actionObj;
+        }
+    };
+    
+    boss.prototype.removeAction = function(actionName){
+        delete this.__actions[actionName];
+    };
+    
+    boss.prototype.getAction = function(actionName){
+        return this.__actions[actionName];
+    };
+    
+    boss.prototype.doAction = function(actionName,someArg){
+        var self = this;
+        var arg = arrayProto.slice.call(arguments,1);
+        if(actionName in self.__actions){
+            self.__actions.apply(self,arg);
+            return true;
+        }else{
+            return false;
+        }
+    };
+    
+    
+    
     boss.prototype.addModel = function(pathOrObj,modelName){
         var self = this;
         if('string' == typeof pathOrObj){
@@ -380,24 +402,28 @@
 
         if(!!pathOrObj){
             if(!modelName){
-                console.error("model name cannot is empty");
+                console.error("model name can't is empty");
                 return null;
             }
             for(var funcName in pathOrObj){
                 var theFunc = pathOrObj[funcName];
                 if('function' == typeof theFunc && pathOrObj.hasOwnProperty(funcName)){
-                    pathOrObj[funcName] = pathOrObj[funcName].bind(self);
+                    pathOrObj[funcName] = pathOrObj[funcName].bind(pathOrObj);
                 }
             }
 
-            self.__models[modelName] = pathOrObj;
+            self.__models[modelName+'Model'] = pathOrObj;
+            self[modelName+'Model'] = pathOrObj;
         }
         return self;
 
     };
+    boss.prototype.removeModel = function(modelName){
+        delete this.__models[modelName+'Model'];
+    };
     boss.prototype.getModel = function(modelName){
         if(modelName){
-            return this.__models[modelName];
+            return this.__models[modelName+'Model'];
         }else{
             return this.__models;
         }
@@ -449,9 +475,9 @@
     var defaultTimeEventsIHD = null;//默认时间事件句柄
     boss.prototype.runDefaultTimeEvents = function(){
         var self = this;
-		if(!!defaultTimeEventsIHD){
-			return defaultTimeEventsIHD;
-		}
+        if(!!defaultTimeEventsIHD){
+            return defaultTimeEventsIHD;
+        }
         defaultTimeEventsIHD = setInterval(self.emitCronjob,1000*60);
         return defaultTimeEventsIHD;
     };
@@ -460,7 +486,7 @@
         if(defaultTimeEventsIHD!==null){
             clearInterval(defaultTimeEventsIHD);
         }
-		defaultTimeEventsIHD = null;
+        defaultTimeEventsIHD = null;
     };
 
     //空函数
@@ -486,18 +512,23 @@
     boss.instanceName = 'boss';
     if(isNode){
         __innerNextTick = boss.prototype.nextTick = setImmediate;
+        _module.exports.create = function(opt){
+            opt = opt||{};
+            var instance = new boss();
+            if(opt.runDefaultTimeEvents!==false){
+                instance.runDefaultTimeEvents();
+            }
+            return instance;
+        };
 
         _module.exports = function(opt){
             opt = opt||{};
             if(!boss.__bossInstance){
-                boss.__bossInstance = new boss();
-                if(opt.runDefaultTimeEvents!==false){
-                    boss.__bossInstance.runDefaultTimeEvents();
-                }
-
+                boss.__bossInstance = _module.exports.create(opt)
             }
             return boss.__bossInstance;
         };
+        
 
         
 
