@@ -521,14 +521,6 @@
     boss.instanceName = 'boss';
     if(isNode){
         __innerNextTick = boss.prototype.nextTick = setImmediate;
-        _module.exports.create = function(opt){
-            opt = opt||{};
-            var instance = new boss();
-            if(opt.runDefaultTimeEvents!==false){
-                instance.runDefaultTimeEvents();
-            }
-            return instance;
-        };
 
         _module.exports = function(opt){
             opt = opt||{};
@@ -537,7 +529,14 @@
             }
             return boss.__bossInstance;
         };
-        
+        _module.exports.create = function(opt){
+            opt = opt||{};
+            var instance = new boss();
+            if(opt.runDefaultTimeEvents!==false){
+                instance.runDefaultTimeEvents();
+            }
+            return instance;
+        };        
 
         
 
