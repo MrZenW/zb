@@ -312,13 +312,13 @@
         endCB = endCB||function(){};
 
         fs.stat(path,function(err,stats){
-    //        console.log(err,stats);
+
             if(err){
                 endCB(err);
                 return;
             }
             var fl = fs.createReadStream(path,{bufferSize:512});
-    //    var nullFl = fs.createReadStream('/dev/null',{bufferSize:512});
+    
 
             var readline = require('readline');
             var rl = readline.createInterface({
@@ -334,10 +334,10 @@
                 }
             })
             fl.on('end',function(){
-                endCB.call(rl,'end',lineNum);
+                endCB.call(rl,null,'end',lineNum);
             });
             fl.on('close',function(){
-                endCB.call(rl,'close',lineNum);
+                endCB.call(rl,null,'close',lineNum);
             });
 
 
